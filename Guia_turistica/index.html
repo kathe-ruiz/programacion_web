@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title> Guia Turistica</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <!-- Bootstrap -->
+        <link href="css/bootstrap.min.css" rel="stylesheet" media="screen">
+        <link rel="stylesheet" href="css/main.css">
+        <link rel="stylesheet" href="css/mystyle.css">
+        <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.css" />          
+        <script src="http://code.jquery.com/jquery.js"></script>
+        <script src="js/vendor/bootstrap.min.js"></script>
+        <script src="http://cdn.leafletjs.com/leaflet-0.6.4/leaflet.js"></script>
+    </head>
+    <body>
+        <div class="contenedor">   
+            <h2 id="titulo"> Sitios Turisticos de Cali</h2>
+            <div id="map"></div>       
+            <div class="new-marker">               
+                <!-- 1 uso bootstrap -->
+                <button class="btn btn-large btn-block" type="button"><i class="icon-share-alt"></i>Copiar  desde GitHub</button>
+                    
+            </div>
+            <!-- Button to trigger modal -->
+           <!-- hacerlo sin javascript desde un boton u enlace
+            <a href="#myModal" role="button" class="btn" data-toggle="modal">Launch demo modal</a>
+            -->
+            <!-- Modal -->
+            <div id="myModal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
+              <div class="modal-header">
+                
+                <h3 id="myModalLabel">Marcador</h3>
+              </div>
+              <div class="modal-body">
+                 <input id="input-modal" type="text" placeholder="Descripcion del marcador"/>
+                 
+              </div>
+              <div class="modal-footer">
+                <button class="btn" data-dismiss="modal" aria-hidden="true">Cerrar</button>
+                <button id="boton" class="btn btn-primary">Guardar</button>
+              </div>
+            </div>
+        </div>
+        
+      
+ 
+ 
+        
+        
+        <script>
+            
+            var map = L.map('map').setView([3.42295, -76.524609], 13);
+			var inputM;
+			
+            L.tileLayer('http://{s}.tile.cloudmade.com/BC9A493B41014CAABB98F0471D759707/997/256/{z}/{x}/{y}.png', {
+                maxZoom: 18,
+                attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>, Imagery © <a href="http://cloudmade.com">CloudMade</a>'
+            }).addTo(map);
+			//marker para la nueva localizacion que realice un usuario
+			var user_icon = L.icon({
+				iconUrl: 'img/user_icon.png',
+				//iconRetinaUrl: 'my-icon@2x.png',
+				iconSize: [38, 45],
+				iconAnchor: [22, 60],
+				popupAnchor: [-3, -76],
+				//shadowUrl: 'my-icon-shadow.png',
+				//shadowRetinaUrl: 'my-icon-shadow@2x.png',
+				shadowSize: [68, 95],
+				shadowAnchor: [22, 94]
+			});
+                        //marker para la localizacion del usuario
+                        var icon = L.icon({
+				iconUrl: 'img/icon.png',				
+				//iconRetinaUrl: 'my-icon@2x.png',
+				iconSize: [50, 60],
+				iconAnchor: [22, 60],
+				popupAnchor: [-3, -76],
+				//shadowUrl: 'my-icon-shadow.png',
+				//shadowRetinaUrl: 'my-icon-shadow@2x.png',
+				shadowSize: [68, 95],
+				shadowAnchor: [22, 94]
+			});
+			//esta es la funcion del evento cuando da click en el mapa
+            map.on('click', function(e) {
+                
+			var lat = e.latlng.lat;
+			var lng = e.latlng.lat;			
+			   //Cuando da click en el mapa muestra un modal
+               $('#myModal').modal(); 
+			   //click  en el boton guardar
+			   $('#boton').click(function(){
+				   //obtiene el valor del input text
+				   inputM = $('#input-modal').val();
+				   //agrega el texto al popup del marcador
+				   //e es el evento y trae la localizacion donde se hizo click 
+                                   if(inputM !== undefined)
+                                   {
+				   L.marker(e.latlng,{icon: user_icon}).addTo(map).bindPopup(inputM);                                    
+                                   }
+				   if(sessionStorage.lati && sessionStorage.longi)
+				   {
+					sessionStorage.lati += "," + lat;
+					sessionStorage.longi += "," + lng;
+				   }
+				   else
+				   {
+					sessionStorage.lati=lat;
+				    sessionStorage.longi=lng;				   
+				   }
+				   //esconde el modal 
+				   $('#myModal').modal('hide');
+                                   
+			   });
+                           $("#input-modal").val("");
+            });
+			
+            //datos importantes q, access_token, fields, type, center indica la ubicacion, distance
+            var url_museos = "https://graph.facebook.com/search?q=museo&type=place&center=3.42295,-76.524609&distance=5000&fields=name,description,location,link,picture.width(200).height(200)&access_token=AGREGAR_TU_PROPIO_ACCESSTOKEN";
+            var url_monumentos ="https://graph.facebook.com/search?q=monumento&type=place&center=3.42295,-76.524609&distance=5000&fields=name,location,description,link,picture.width(200).height(200)&access_token=AGREGAR_TU_PROPIO_ACCESSTOKEN";
+            var url_teatros ="https://graph.facebook.com/search?q=teatro&type=place&center=3.42295,-76.524609&distance=5000&fields=name,location,description,link,picture.width(200).height(200)&access_token=AGREGAR_TU_PROPIO_ACCESSTOKEN";
+            var url_parques="https://graph.facebook.com/search?q=parque&type=place&center=3.42295,-76.524609&distance=5000&fields=name,location,description,link,picture.width(200).height(200)&access_token=AGREGAR_TU_PROPIO_ACCESSTOKEN";
+            var url_zoo="https://graph.facebook.com/134015240001125?fields=about,location,name,link,picture.width(200).height(200)&access_token=AGREGAR_TU_PROPIO_ACCESSTOKEN";
+            var url_miradores="https://graph.facebook.com/search?q=mirador&type=place&center=3.42295,-76.524609&distance=5000&fields=name,location,description,link,picture.width(200).height(200)&access_token=AGREGAR_TU_PROPIO_ACCESSTOKEN";
+            var url_rios="https://graph.facebook.com/search?q=rio&type=place&center=3.42295,-76.524609&distance=5000&fields=name,location,description,link,picture.width(200).height(200)&access_token=AGREGAR_TU_PROPIO_ACCESSTOKEN";
+            var array_urls=[url_museos,url_monumentos,url_teatros,url_parques, url_zoo, url_miradores, url_rios];
+            
+    $(document).ready(function () {
+			
+            for ( var i = 0; i < array_urls.length; i = i + 1 ) {
+                //envia como parametro cada url del array. La cual contiene un ARRAY DE TODOS LOS OBJETOS de la busqueda
+                agregar_popups(array_urls[i]);
+                function agregar_popups(url){
+                        $.ajax({
+                                url:url,
+                                type:"GET",
+                                dataType:"json",
+                                crossDomain:false,
+                                async:true,
+                                success:function(result){
+                                    var objetos=result['data'];
+                                    //si el objeto es un array tiene la propiedad data
+                                    if(objetos !==  undefined){
+                                        for (var j = 0; j < objetos.length; j = j + 1)
+                                            {
+                                            popups(objetos[j]); 
+                                            //console.log(objetos[j]);
+                                            } 
+                                    }
+                                    //el objeto no es un array
+                                    else
+                                        {
+                                            console.log(result);
+                                            popups(result);
+                                        }
+                                }
+
+                        });
+                  
+                    }
+           
+                }
+                function popups(objeto){
+                           var name= objeto.name;
+                           var url_imagen= objeto.picture['data'].url;
+                           var imagen_silueta=objeto.picture['data'].is_silhouette;
+                           var latitude = objeto.location.latitude;
+                           var longitude = objeto.location.longitude;
+                           var url_face = objeto.link;
+                           var descripcion= objeto.description;
+                           var mostrar = "<a href='"+url_face+"'>"; 
+                           mostrar +="<h3>"+name+"</h3>";                          
+                           mostrar += "</a></br>";
+                           if(imagen_silueta === false)
+                           {
+                                mostrar += '<img  src="'+url_imagen+'"/> </br>';
+                           }    
+                           if(descripcion !== undefined)
+                            {
+                                 mostrar += descripcion;                                    
+                            }
+                               
+                           //agrega los pop ups al mapa
+                           L.marker([latitude, longitude]).addTo(map).bindPopup(mostrar);
+                         
+                           //console.log(latitude);
+                  }
+                  
+              //trae la localizacion de usuario    
+            function getLocation()
+              {
+              if (navigator.geolocation)
+                {
+                navigator.geolocation.getCurrentPosition(showPosition);
+                }
+              else{
+                  alert("Geolocalizacion, no la soporta este navegador");
+                  }
+              }
+            function showPosition(position)
+              {
+              var latitude=  position.coords.latitude;
+              var longitude=  position.coords.longitude;
+              var popup ='<h2>Aqui Estas! </h2>'
+               L.marker([latitude, longitude],{icon: icon}).addTo(map).bindPopup(popup); 
+               var circle = L.circle([latitude, longitude], 500, {
+                color: 'red',
+                fillColor: '#f03',
+                fillOpacity: 0.5
+            }).addTo(map);
+              }  
+              getLocation();
+              
+	}); 
+        </script>
+        
+    </body>
+</html>
